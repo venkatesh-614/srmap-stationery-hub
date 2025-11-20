@@ -1,0 +1,12 @@
+# Ignore dependencies
+node_modules/
+
+# Ignore database (so you don't overwrite live data)
+db.json
+
+# Ignore uploaded files
+uploads/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
