@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 photo_4x6: parseFloat(priceForm.elements.photo_4x6.value),
                 passport: parseFloat(priceForm.elements.passport.value),
                 rush: parseFloat(priceForm.elements.rush.value),
-                singleSided: 0 // This is fixed
+                singleSided: 0 
             };
             
             try {
@@ -277,12 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Chart Logic ---
     async function fetchChartData(range = 'month-by-week') {
-        console.log(`Fetching chart data for range: ${range}`); // Debug
+        console.log(`Fetching chart data for range: ${range}`); 
         try {
             const res = await fetch(`/api/chart-data?range=${range}`);
             if (!res.ok) throw new Error(`Failed to fetch chart data for range: ${range}`);
             const data = await res.json();
-            console.log("Received chart data:", data); // Debug
+            console.log("Received chart data:", data); 
             
             let title = 'Revenue Overview';
             if (range === 'month-by-week') title = 'This Month by Week';
@@ -294,13 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update active button style
             document.querySelectorAll('.chart-filter-btn').forEach(btn => {
-                // Remove active classes
+                
                 btn.classList.remove('bg-indigo-500', 'text-white');
-                // Add inactive classes
+                
                 btn.classList.add('bg-gray-700', 'text-gray-300');
                 
                 if (btn.dataset.range === range) {
-                    // Swap classes for active button
+                    
                     btn.classList.remove('bg-gray-700', 'text-gray-300');
                     btn.classList.add('bg-indigo-500', 'text-white');
                 }
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = revenueChartCanvas.getContext('2d');
         
         if (revenueChart) {
-            revenueChart.destroy(); // Destroy old chart instance
+            revenueChart.destroy(); 
         }
 
         revenueChart = new Chart(ctx, {
@@ -326,11 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     {
                         label: 'Revenue',
                         data: data,
-                        backgroundColor: 'rgba(99, 102, 241, 0.6)', // Indigo-500 with opacity
-                        borderColor: '#818CF8', // Indigo-400
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)', 
+                        borderColor: '#818CF8', 
                         borderWidth: 1,
                         borderRadius: 4,
-                        // Line chart part of the combo
+                        
                         type: 'line',
                         tension: 0.3,
                         fill: false,
@@ -348,16 +348,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            color: '#9CA3AF', // gray-400
+                            color: '#9CA3AF', 
                             callback: (value) => `₹${value}`
                         },
                         grid: {
-                            color: '#374151' // gray-700
+                            color: '#374151' 
                         }
                     },
                     x: {
                         ticks: {
-                            color: '#9CA3AF' // gray-400
+                            color: '#9CA3AF' 
                         },
                         grid: {
                             display: false
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     tooltip: {
                         enabled: true,
-                        backgroundColor: '#1F2937', // gray-800
+                        backgroundColor: '#1F2937', 
                         titleColor: '#fff',
                         bodyColor: '#fff',
                         callbacks: {
