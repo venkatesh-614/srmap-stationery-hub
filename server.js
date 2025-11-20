@@ -33,11 +33,11 @@ const PORT = 3000;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// --- !! REPLACE WITH YOUR REAL TEST KEYS !! ---
+
 const RAZORPAY_KEY_ID = 'rzp_test_RhfXQ1B5kKWNSt'; 
 const RAZORPAY_KEY_SECRET = 'lrynvwb3Xaq4BRxsa53BoYaX';
 
-// --- MIDDLEWARE ---
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -361,17 +361,17 @@ app.get('/api/stats', checkAuth, (req, res) => {
     }
 });
 
-// ** NEW/UPDATED Chart Data API **
+// **Chart Data API **
 app.get('/api/chart-data', checkAuth, (req, res) => {
     try {
-        const range = req.query.range || 'month-by-week'; // 'month-by-week', 'year-by-month', 'all-years'
+        const range = req.query.range || 'month-by-week'; 
         const allOrders = db.get('orders').value();
         const now = new Date();
         let labels = [];
         let data = [];
 
         if (range === 'month-by-week') {
-            // Shows revenue for Week 1, 2, 3, 4 of the current month
+            
             labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
             data = [0, 0, 0, 0];
             const currentMonth = now.getMonth();
@@ -389,7 +389,7 @@ app.get('/api/chart-data', checkAuth, (req, res) => {
             });
 
         } else if (range === 'year-by-month') {
-            // Shows revenue for Jan, Feb, Mar... of the current year
+            
             labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             data = Array(12).fill(0);
             const currentYear = now.getFullYear();
@@ -397,14 +397,14 @@ app.get('/api/chart-data', checkAuth, (req, res) => {
             allOrders.forEach(order => {
                 const orderDate = new Date(order.timestamp);
                 if (orderDate.getFullYear() === currentYear) {
-                    const monthIndex = orderDate.getMonth(); // 0 = Jan, 1 = Feb
+                    const monthIndex = orderDate.getMonth(); 
                     data[monthIndex] += order.price;
                 }
             });
 
         } else if (range === 'all-years') {
-            // Shows total revenue for each year
-            const yearlyData = {}; // e.g., { "2024": 1500, "2025": 800 }
+            
+            const yearlyData = {}; 
             allOrders.forEach(order => {
                 const year = new Date(order.timestamp).getFullYear().toString();
                 if (!yearlyData[year]) yearlyData[year] = 0;
@@ -428,7 +428,7 @@ app.get('/api/chart-data', checkAuth, (req, res) => {
 app.patch('/api/orders/:id/status', checkAuth, (req, res) => {
     try {
         const order = db.get('orders').find({ id: req.params.id }).assign({ status: req.body.status }).write();
-        broadcast('status_update', order); // Notify clients of status change
+        broadcast('status_update', order); 
         res.json(order);
     } catch (error) {
         console.error("Error updating order status:", error);
