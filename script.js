@@ -1,4 +1,3 @@
-// Wait for the entire HTML document to load before running any script
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- ELEMENT SELECTORS ---
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeModalButton) {
         closeModalButton.addEventListener('click', () => {
             tokenModal.classList.add('hidden');
-            resetUploader(); // Reset the whole page after finishing
+            resetUploader(); 
         });
     }
 
@@ -50,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             link.classList.toggle('active', link.dataset.page === pageId);
         });
         mobileNavLinks.forEach(link => {
-            link.classList.toggle('active', link.dataset.page === pageId); // 'active' might not be styled, but good practice
+            link.classList.toggle('active', link.dataset.page === pageId); 
         });
     }
 
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageId = e.currentTarget.dataset.page;
             showPage(pageId);
             window.location.hash = pageId;
-            if(mobileMenu) mobileMenu.classList.add('hidden'); // Close menu on click
+            if(mobileMenu) mobileMenu.classList.add('hidden'); 
         });
     });
 
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orderDetailsSection.classList.add('hidden');
         orderDetailsSection.innerHTML = '';
         
-        // Go back to the home page view
+        
         showPage('home');
     }
 
@@ -181,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <input type="number" id="copies" value="1" min="1" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm">
                     </div>
                 </div>`;
-        } else { // Image
+        } else { 
             optionsHTML = `
                 <!-- ** STYLES FIXED FOR DARK MODE ** -->
                 <h3 class="text-xl font-semibold text-center text-white mb-6">Choose Photo Service</h3>
@@ -247,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
             toggleFirstPageColorOption();
         }
-        updateSummary(); // Call once to set initial state
+        updateSummary(); 
     }
     
     function updateSummary() {
@@ -273,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             singleCopyPrice = options.pages * pageCost;
 
             if (options.firstPageColor && options.pages >= 1) {
-                singleCopyPrice += prices.firstPageColor; // Add the difference
+                singleCopyPrice += prices.firstPageColor; 
             }
             if (options.binding === 'spiral') {
                 singleCopyPrice += prices.spiral;
@@ -291,13 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (options.binding === 'spiral') summaryText += `<p>Binding: Spiral</p>`;
         } else {
             options.service = document.getElementById('service').value;
-            options.copies = 1; // Copies not supported for images yet
+            options.copies = 1; 
             price = prices[options.service];
             summaryText = `<p>Service: ${options.service === 'passport' ? 'Passport Photos' : '4x6 Print'}</p>`;
         }
 
         if (options.rush) price += RUSH_FEE;
-        if (options.rush) summaryText += `<p class="text-red-400 font-semibold">Rush Order: +₹${RUSH_FEE}</p>`; // Brighter red
+        if (options.rush) summaryText += `<p class="text-red-400 font-semibold">Rush Order: +₹${RUSH_FEE}</p>`; 
         
         document.getElementById('total-price').textContent = `₹${Math.max(0, price).toFixed(2)}`;
         document.getElementById('summary-details').innerHTML = summaryText;
