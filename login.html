@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js Library for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style> 
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0c0a18; 
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; 
+            background: linear-gradient(180deg, #0c0a18 0%, #222 100%);
+        }
+        /* Dark "frosted glass" effect for the login card */
+        .login-card {
+            background-color: rgba(17, 24, 39, 0.85); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex items-center justify-center h-screen">
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="w-full max-w-sm">
+        <div class="login-card shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 border border-gray-700">
+            <h1 class="text-2xl font-bold text-center text-indigo-400 mb-6">Admin Login</h1>
+            
+            <!-- Error Message -->
+            <div id="error-message" class="hidden bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline">Invalid username or password.</span>
+            </div>
+            
+            <form id="login-form">
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2" for="username">
+                        Username
+                    </label>
+                    <input class="shadow appearance-none border border-gray-600 bg-gray-700 rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" id="username" type="text" placeholder="Username" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-300 text-sm font-bold mb-2" for="password">
+                        Password
+                    </label>
+                    <input class="shadow appearance-none border border-gray-600 bg-gray-700 rounded w-full py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500" id="password" type="password" placeholder="******************" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full" type="submit">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="login.js"></script>
+
+    <!-- JavaScript for 3D Background -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const canvas = document.getElementById('bg-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); 
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                const paperCount = 50;
+                const papers = [];
+                const paperGeometry = new THREE.PlaneGeometry(0.5, 0.7); 
+                const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+
+                for (let i = 0; i < paperCount; i++) {
+                    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+                    paper.position.x = (Math.random() - 0.5) * 20;
+                    paper.position.y = (Math.random() - 0.5) * 20;
+                    paper.position.z = (Math.random() - 0.5) * 10;
+                    paper.rotation.x = Math.random() * Math.PI;
+                    paper.rotation.y = Math.random() * Math.PI;
+                    paper.rotation.z = Math.random() * Math.PI;
+                    paper.userData.speed = {
+                        x: (Math.random() - 0.5) * 0.01,
+                        y: (Math.random() - 0.5) * 0.01,
+                        z: (Math.random() - 0.5) * 0.01,
+                        float: 0.01 + Math.random() * 0.02 
+                    };
+                    papers.push(paper);
+                    scene.add(paper);
+                }
+                camera.position.z = 5;
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    papers.forEach(paper => {
+                        paper.position.y += paper.userData.speed.float;
+                        paper.rotation.x += paper.userData.speed.x;
+                        paper.rotation.y += paper.userData.speed.y;
+                        paper.rotation.z += paper.userData.speed.z;
+                        if (paper.position.y > 10) {
+                            paper.position.y = -10;
+                            paper.position.x = (Math.random() - 0.5) * 20;
+                        }
+                    });
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                });
+            } catch (e) {
+                console.error("Three.js animation failed:", e);
+                const canvas = document.getElementById('bg-canvas');
+                if(canvas) canvas.style.display = 'none'; 
+            }
+        });
+    </script>
+</body>
+</html>

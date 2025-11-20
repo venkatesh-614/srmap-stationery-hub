@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRMAP Stationery Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- This is the script required for Razorpay payments -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <!-- Three.js Library for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0c0a18; 
+        }
+        .nav-link.active {
+            color: #818CF8; /* indigo-400 */
+            font-weight: 600;
+        }
+        main > div.page-section {
+            margin-bottom: 2rem; 
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; 
+            background: linear-gradient(180deg, #0c0a18 0%, #222 100%);
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(17, 24, 39, 0.85); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        main > div.page-section {
+            background-color: rgba(17, 24, 39, 0.85); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200"> 
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <!-- Left Side: Logo and Title -->
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0 bg-indigo-500 text-white w-12 h-12 rounded-full flex items-center justify-center">
+                    <span class="text-xl font-bold tracking-tighter">SH</span>
+                </div>
+                <div>
+                    <!-- ** RESPONSIVE FONT SIZE ** -->
+                    <h1 class="text-xl md:text-2xl font-bold text-indigo-400">SRMAP Stationery Hub</h1> 
+                    <p class="text-sm text-gray-400">The fastest way to get documents printed.</p> <!-- Shortened subtitle -->
+                </div>
+            </div>
+
+            <!-- Right Side: Navigation (Desktop) -->
+            <!-- ** HIDDEN ON MOBILE, FLEX ON MEDIUM SCREENS AND UP ** -->
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="#home" class="nav-link text-gray-300 hover:text-indigo-400 font-medium active" data-page="home">Home</a>
+                <a href="#services" class="nav-link text-gray-300 hover:text-indigo-400 font-medium" data-page="services">Services</a>
+                <a href="#contact" class="nav-link text-gray-300 hover:text-indigo-400 font-medium" data-page="contact">Contact</a>
+            </nav>
+
+            <!-- ** NEW: Mobile Menu Button ** -->
+            <!-- ** SHOWN ON MOBILE, HIDDEN ON MEDIUM SCREENS AND UP ** -->
+            <div class="md:hidden">
+                <button id="menu-button" class="text-gray-300 hover:text-indigo-400">
+                    <span class="sr-only">Open menu</span>
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ** NEW: Mobile Menu (Hidden by default) ** -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-indigo-400" data-page="home">Home</a>
+                <a href="#services" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-indigo-400" data-page="services">Services</a>
+                <a href="#contact" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-indigo-400" data-page="contact">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        
+        <!-- ======================= -->
+        <!--      HOME PAGE         -->
+        <!-- ======================= -->
+        <div id="home" class="page-section text-center p-6 md:p-8 rounded-lg shadow-md">
+            <!-- ** RESPONSIVE FONT SIZE ** -->
+            <h2 class="text-3xl lg:text-4xl font-bold tracking-tight text-white">Skip the Rush. Print Online.</h2>
+            <p class="mt-4 text-base md:text-lg leading-8 text-gray-300">Upload your file, choose your options, and pick it up when it's ready.</p>
+            
+            <!-- === HOW IT WORKS SECTION === -->
+            <div class="my-12 max-w-3xl mx-auto">
+                <h3 class="text-xl font-semibold text-gray-100 mb-6">How It Works</h3>
+                <!-- ** RESPONSIVE GRID: Stacks on mobile, 3-col on desktop ** -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    <!-- Step 1 -->
+                    <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-indigo-400"></i>
+                            <span class="text-lg font-semibold text-white">1. Upload File</span>
+                        </div>
+                        <p class="text-gray-300 mt-2 text-sm">Select your PDF, JPG, or PNG file from your device.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="settings-2" class="w-8 h-8 text-indigo-400"></i>
+                            <span class="text-lg font-semibold text-white">2. Customize & Pay</span>
+                        </div>
+                        <p class="text-gray-300 mt-2 text-sm">Choose your print options and pay securely online.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="ticket" class="w-8 h-8 text-indigo-400"></i>
+                            <span class="text-lg font-semibold text-white">3. Get Token</span>
+                        </div>
+                        <p class="text-gray-300 mt-2 text-sm">Receive a unique token (e.g., B-101) for your order.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- === END: HOW IT WORKS SECTION === -->
+
+            <div class="mt-10 max-w-2xl mx-auto">
+                <!-- Uploader Area -->
+                <div id="uploader-container">
+                    <label for="file-input" class="relative block w-full rounded-lg border-2 border-dashed border-gray-600 p-8 md:p-12 text-center hover:border-gray-500 cursor-pointer transition-colors">
+                        <svg class="mx-auto h-12 w-12 text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        <p class="mt-2 block text-sm text-gray-400">
+                            Drag & Drop your file here <br> or <span class="font-semibold text-indigo-400">click to browse</span>
+                        </p>
+                        <input id="file-input" type="file" class="sr-only" accept=".pdf,.jpg,.jpeg,.png">
+                    </label>
+                </div>
+
+                <!-- Uploaded File View (Initially Hidden) -->
+                <div id="uploaded-file-container" class="hidden relative mt-4 text-left bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-sm">
+                     <button id="deselect-file-btn" class="absolute top-2 right-2 text-gray-400 hover:text-gray-300 p-1 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                    <p class="text-sm font-medium text-white">Selected File:</p>
+                    <p id="uploaded-file-name" class="text-indigo-400 truncate pr-8"></p>
+                    <p id="page-count-status" class="text-sm text-gray-400 mt-1 h-5"></p>
+                </div>
+                <strong class="text-xs text-red-400 mt-2">Accepted files: PDF, JPG, PNG. Max size: 30MB.</strong>
+            </div>
+
+            <!-- Options & Summary will be injected here by JS -->
+            <div id="order-details-section" class="hidden mt-12 max-w-2xl mx-auto space-y-8">
+                <!-- Populated by script.js, Tailwind classes will adapt -->
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!--    SERVICES PAGE       -->
+        <!-- ======================= -->
+        <div id="services" class="page-section hidden p-6 md:p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl lg:text-4xl font-bold tracking-tight text-white sm:text-4xl mb-8">Our Services</h2>
+            
+            <!-- ** RESPONSIVE GRID: 1-col, 2-col, 3-col ** -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="file-text" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">B/W Xerox</h3>
+                    <p class="text-gray-300 mt-2">Fast black and white copies for documents up to A3 size.</p>
+                </div>
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="palette" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">Color Xerox</h3>
+                    <p class="text-gray-300 mt-2">Vivid copies up to A3. Popular for presentations.</p>
+                </div>
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="book" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">Spiral & Hard Binding</h3>
+                    <p class="text-gray-300 mt-2">Professional binding for reports, projects, and presentations.</p>
+                </div>
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="layers" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">Lamination</h3>
+                    <p class="text-gray-300 mt-2">Protect documents with gloss or matte lamination.</p>
+                </div>
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="image" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">Photo Prints</h3>
+                    <p class="text-gray-300 mt-2">High-quality photo printing in various glossy and matte sizes.</p>
+                </div>
+                <!-- Service Card -->
+                <div class="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
+                    <i data-lucide="scan-line" class="w-10 h-10 text-indigo-400 mb-3"></i>
+                    <h3 class="text-xl font-semibold text-white">Scanning</h3>
+                    <p class="text-gray-300 mt-2">Digital copies of your documents with email or USB delivery.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= -->
+        <!--     CONTACT PAGE       -->
+        <!-- ======================= -->
+        <div id="contact" class="page-section hidden p-6 md:p-8 rounded-lg shadow-md">
+            <h2 class="text-3xl lg:text-4xl font-bold tracking-tight text-white sm:text-4xl mb-8">Contact & Location</h2>
+            
+            <!-- ** RESPONSIVE GRID: Stacks on mobile, 2-col on desktop ** -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Left Column: Info -->
+                <div class="space-y-6">
+                    <!-- Address -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-indigo-400 mr-3"></i>
+                            Address
+                        </h3>
+                        <p class="text-gray-300 mt-2 pl-8">
+                            Ground Floor, University Library<br>
+                            SRMAP Campus, Neerukonda, AP 522502
+                        </p>
+                    </div>
+                    <!-- Opening Hours -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            <i data-lucide="clock" class="w-5 h-5 text-indigo-400 mr-3"></i>
+                            Opening Hours
+                        </h3>
+                        <ul class="text-gray-300 mt-2 pl-8 space-y-1">
+                            <li><strong>Monday - Friday:</strong> 8:00 AM - 8:00 PM</li>
+                            <li><strong>Saturday:</strong> 9:00 AM - 6:00 PM</li>
+                            <li><strong>Sunday:</strong> 10:00 AM - 4:00 PM</li>
+                        </ul>
+                    </div>
+                    <!-- Get in Touch -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            <i data-lucide="phone-call" class="w-5 h-5 text-indigo-400 mr-3"></i>
+                            Get in Touch
+                        </h3>
+                         <ul class="text-gray-300 mt-2 pl-8 space-y-1">
+                            <li><strong>Phone:</strong> +91 123 456 7890</li>
+                            <li><strong>WhatsApp:</strong> +91 123 456 7890</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Right Column: Map -->
+                <div>
+                    <div class="w-full h-80 bg-gray-800 rounded-lg flex items-center justify-center">
+                        <p class="text-gray-500">Google Map Placeholder</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Token Modal (No change) -->
+    <div id="token-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center fade-in">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+            </div>
+            <h3 class="text-2xl font-semibold mt-4 text-gray-900">Payment Successful!</h3>
+            <p class="text-gray-600 mt-2">Your order has been placed. Please show this token ID at the counter to collect your documents.</p>
+            <div class="my-6 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg py-4">
+                <p class="text-sm text-gray-500">Your Token ID is:</p>
+                <p id="token-id" class="text-4xl font-extrabold tracking-wider text-indigo-600 mt-1">A-101</p>
+            </div>
+            <p class="text-xs text-gray-500">A confirmation has also been sent to your WhatsApp.</p>
+            <button id="close-modal-button" class="mt-6 w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700">Done</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    
+    <!-- JavaScript for Navigation AND 3D Background -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- ** NEW: Mobile Menu Logic ** ---
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+            if(menuButton) {
+                menuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // --- Navigation Logic (Desktop) ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pageSections = document.querySelectorAll('.page-section');
+
+            function showPage(pageId) {
+                pageSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                }
+                // Update active link for desktop
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.page === pageId);
+                });
+                // Update active link for mobile
+                mobileNavLinks.forEach(link => {
+                    // Mobile links might not have 'active' styling, but good practice
+                    link.classList.toggle('active', link.dataset.page === pageId);
+                });
+            }
+
+            // Add listeners for desktop links
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = e.currentTarget.dataset.page;
+                    showPage(pageId);
+                    window.location.hash = pageId; 
+                });
+            });
+
+            // ** NEW: Add listeners for mobile links **
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = e.currentTarget.dataset.page;
+                    showPage(pageId);
+                    window.location.hash = pageId;
+                    mobileMenu.classList.add('hidden'); // Close menu on click
+                });
+            });
+
+            // Check URL hash on load to show the correct page
+            const initialPage = window.location.hash.substring(1) || 'home';
+            showPage(initialPage);
+
+            // --- Lucide Icons ---
+            try {
+                lucide.createIcons();
+            } catch (e) {
+                console.error("Lucide icons failed to create:", e);
+            }
+
+            // --- Floating Paper Animation ---
+            try {
+                const canvas = document.getElementById('bg-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); 
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                const paperCount = 50;
+                const papers = [];
+                const paperGeometry = new THREE.PlaneGeometry(0.5, 0.7); 
+                const paperMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xffffff, 
+                    side: THREE.DoubleSide
+                });
+
+                for (let i = 0; i < paperCount; i++) {
+                    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+                    
+                    paper.position.x = (Math.random() - 0.5) * 20;
+                    paper.position.y = (Math.random() - 0.5) * 20;
+                    paper.position.z = (Math.random() - 0.5) * 10;
+                    
+                    paper.rotation.x = Math.random() * Math.PI;
+                    paper.rotation.y = Math.random() * Math.PI;
+                    paper.rotation.z = Math.random() * Math.PI;
+
+                    paper.userData.speed = {
+                        x: (Math.random() - 0.5) * 0.01,
+                        y: (Math.random() - 0.5) * 0.01,
+                        z: (Math.random() - 0.5) * 0.01,
+                        float: 0.01 + Math.random() * 0.02 
+                    };
+
+                    papers.push(paper);
+                    scene.add(paper);
+                }
+
+                camera.position.z = 5;
+
+                const mouse = new THREE.Vector2();
+                document.addEventListener('mousemove', (event) => {
+                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                });
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+
+                    papers.forEach(paper => {
+                        paper.position.y += paper.userData.speed.float;
+                        paper.rotation.x += paper.userData.speed.x;
+                        paper.rotation.y += paper.userData.speed.y;
+                        paper.rotation.z += paper.userData.speed.z;
+                        if (paper.position.y > 10) {
+                            paper.position.y = -10;
+                            paper.position.x = (Math.random() - 0.5) * 20;
+                        }
+                    });
+                    
+                    camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.05;
+                    camera.position.y += (-mouse.y * 0.5 - camera.position.y) * 0.05;
+                    camera.lookAt(scene.position);
+
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                });
+
+            } catch (e) {
+                console.error("Three.js animation failed:", e);
+                const canvas = document.getElementById('bg-canvas');
+                if(canvas) canvas.style.display = 'none'; 
+            }
+        });
+    </script>
+</body>
+</html>

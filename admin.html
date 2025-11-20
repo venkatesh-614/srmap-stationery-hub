@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SRMAP Stationery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <!-- Three.js Library for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ** NEW: Chart.js Data Labels Plugin ** -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0c0a18; 
+            overflow: hidden; /* Prevent scrolling of the whole page */
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; 
+            background: linear-gradient(180deg, #0c0a18 0%, #222 100%);
+        }
+        /* Dark "frosted glass" effect */
+        header, .admin-page-section, .order-card, .chart-container, .stats-card {
+            background-color: rgba(17, 24, 39, 0.85); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .order-column { 
+            height: calc(100vh - 200px); /* Adjust height relative to viewport */
+            overflow-y: auto;
+        }
+        
+        /* --- Standard CSS for Sidebar Links --- */
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem; /* p-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            color: rgb(209 213 219); /* text-gray-300 */
+            transition-property: background-color, color;
+            transition-duration: 150ms;
+        }
+        .sidebar-link:hover {
+            background-color: rgb(55 65 81); /* hover:bg-gray-700 */
+            color: rgb(255 255 255); /* hover:text-white */
+        }
+        .sidebar-link.active {
+            background-color: rgb(99 102 241); /* bg-indigo-500 */
+            color: rgb(255 255 255); /* text-white */
+            font-weight: 600; /* font-semibold */
+        }
+        /* --- End of standard CSS --- */
+
+        #sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="flex h-screen">
+        <!-- ==== Sidebar Navigation ==== -->
+        <nav id="sidebar" class="flex-shrink-0 w-64 bg-gray-900/90 p-5 shadow-lg border-r border-gray-700 flex flex-col z-10">
+            <!-- Logo/Title -->
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="flex-shrink-0 bg-indigo-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                    <span class="text-lg font-bold tracking-tighter">SH</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-indigo-400">Admin Panel</h1>
+                </div>
+            </div>
+            
+            <!-- Nav Links -->
+            <div class="flex-1 space-y-2">
+                <a href="#queue" class="sidebar-link nav-link active" data-page="queue">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                    <span>Live Queue</span>
+                </a>
+                <a href="#pricing" class="sidebar-link nav-link" data-page="pricing">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 mr-3"></i>
+                    <span>Price Settings</span>
+                </a>
+                <a href="#all-orders" class="sidebar-link nav-link" data-page="all-orders">
+                    <i data-lucide="archive" class="w-5 h-5 mr-3"></i>
+                    <span>All Orders</span>
+                </a>
+                <a href="#reports" class="sidebar-link nav-link" data-page="reports">
+                    <i data-lucide="file-text" class="w-5 h-5 mr-3"></i>
+                    <span>Export Reports</span>
+                </a>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="mt-auto">
+                <a href="/logout" class="sidebar-link">
+                    <i data-lucide="log-out" class="w-5 h-5 mr-3 text-red-400"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- ==== Main Content Area ==== -->
+        <div class="flex-1 flex flex-col h-screen min-w-0">
+            <!-- Top Header -->
+            <header class="shadow-sm z-10">
+                <div class="px-4 sm:px-8 py-4 flex items-center">
+                    <!-- Hamburger button -->
+                    <button id="sidebar-toggle" class="p-2 -ml-2 rounded-md text-gray-300 hover:text-indigo-400 hover:bg-gray-700">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <h1 id="page-title" class="text-xl font-bold text-indigo-400 ml-4">Live Order Queue</h1>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto p-8">
+
+                <!-- ==== PAGE 1: Live Queue (The Dashboard) ==== -->
+                <div id="queue" class="admin-page-section">
+                    
+                    <!-- ==== Stats Bar ==== -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Stat Card 1 -->
+                        <div class="stats-card p-4 rounded-lg flex items-center border border-gray-700">
+                            <i data-lucide="wallet" class="w-10 h-10 text-green-400 mr-4"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Total Revenue (Today)</p>
+                                <p id="stats-total-revenue" class="text-3xl font-bold text-white">₹0.00</p>
+                            </div>
+                        </div>
+                        <!-- Stat Card 2 -->
+                        <div class="stats-card p-4 rounded-lg flex items-center border border-gray-700">
+                            <i data-lucide="archive" class="w-10 h-10 text-blue-400 mr-4"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Total Orders (Today)</p>
+                                <p id="stats-total-orders" class="text-3xl font-bold text-white">0</p>
+                            </div>
+                        </div>
+                        <!-- Stat Card 3 -->
+                        <div class="stats-card p-4 rounded-lg flex items-center border border-gray-700">
+                            <i data-lucide="loader" class="w-10 h-10 text-yellow-400 mr-4"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-400">Pending Orders</p>
+                                <p id="stats-pending-orders" class="text-3xl font-bold text-white">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ==== End of Stats Bar ==== -->
+                    
+                    <!-- ==== Revenue Chart ==== -->
+                    <div class="chart-container p-6 rounded-lg border border-gray-700 mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 id="chart-title" class="text-xl font-semibold text-white">Revenue Overview</h3>
+                            <!-- ** NEW: Updated filter buttons ** -->
+                            <div id="chart-filters" class="flex space-x-2">
+                                <button class="chart-filter-btn bg-gray-700 text-gray-300 py-1 px-3 rounded-md text-sm" data-range="month-by-week">Weekly</button>
+                                <button class="chart-filter-btn bg-gray-700 text-gray-300 py-1 px-3 rounded-md text-sm" data-range="year-by-month">Monthly</button>
+                                <button class="chart-filter-btn bg-gray-700 text-gray-300 py-1 px-3 rounded-md text-sm" data-range="all-years">Yearly</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                    </div>
+                    <!-- ==== End of Revenue Chart ==== -->
+
+                    <!-- ==== Order Columns ==== -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- New Orders -->
+                        <div class="p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold text-white border-b border-gray-700 pb-2 mb-4 flex items-center">
+                                <span class="w-3 h-3 bg-blue-400 rounded-full mr-2"></span> New Orders
+                            </h2>
+                            <div id="new-orders" class="space-y-4 p-2 order-column">
+                                <!-- Cards inserted here -->
+                            </div>
+                        </div>
+                        <!-- In Progress -->
+                        <div class="p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold text-white border-b border-gray-700 pb-2 mb-4 flex items-center">
+                                <span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span> In Progress
+                            </h2>
+                            <div id="processing-orders" class="space-y-4 p-2 order-column">
+                                <!-- Cards inserted here -->
+                            </div>
+                        </div>
+                        <!-- Ready -->
+                        <div class="p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold text-white border-b border-gray-700 pb-2 mb-4 flex items-center">
+                                <span class="w-3 h-3 bg-green-400 rounded-full mr-2"></span> Ready for Pickup
+                            </h2>
+                            <div id="ready-orders" class="space-y-4 p-2 order-column">
+                                <!-- Cards inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==== PAGE 2: Price Settings ==== -->
+                <div id="pricing" class="admin-page-section hidden p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold text-white mb-6">Manage Prices</h2>
+                    <form id="price-form" class="space-y-4 max-w-md">
+                        <div>
+                            <label for="price-bw" class="block text-sm font-medium text-gray-300">B/W Print (per page)</label>
+                            <input type="number" id="price-bw" name="bw" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2" step="0.5">
+                        </div>
+                        <div>
+                            <label for="price-color" class="block text-sm font-medium text-gray-300">Color Print (per page)</label>
+                            <input type="number" id="price-color" name="color" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2" step="0.5">
+                        </div>
+                        <div>
+                            <label for="price-firstPageColor" class="block text-sm font-medium text-gray-300">First Page Color (extra charge)</label>
+                            <input type="number" id="price-firstPageColor" name="firstPageColor" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2" step="0.5">
+                        </div>
+                        <div>
+                            <label for="price-doubleSided" class="block text-sm font-medium text-gray-300">Double Sided (discount per page)</label>
+                            <input type="number" id="price-doubleSided" name="doubleSided" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2" step="0.1">
+                        </div>
+                        <div>
+                            <label for="price-spiral" class="block text-sm font-medium text-gray-300">Spiral Binding (flat rate)</label>
+                            <input type="number" id="price-spiral" name="spiral" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2">
+                        </div>
+                         <div>
+                            <label for="price-photo_4x6" class="block text-sm font-medium text-gray-300">4x6 Photo Print</label>
+                            <input type="number" id="price-photo_4x6" name="photo_4x6" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2">
+                        </div>
+                         <div>
+                            <label for="price-passport" class="block text-sm font-medium text-gray-300">Passport Photos (8-pack)</label>
+                            <input type="number" id="price-passport" name="passport" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2">
+                        </div>
+                         <div>
+                            <label for="price-rush" class="block text-sm font-medium text-gray-300">Rush Order Fee</label>
+                            <input type="number" id="price-rush" name="rush" class="mt-1 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm sm:text-sm p-2">
+                        </div>
+                        
+                        <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg">
+                            Save Prices
+                        </button>
+                    </form>
+                    <p id="price-status" class="mt-4"></p>
+                </div>
+
+                <!-- ==== PAGE 3: All Orders (Placeholder) ==== -->
+                <div id="all-orders" class="admin-page-section hidden p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold text-white mb-6">All Orders</h2>
+                    <p class="text-gray-400">A table of all past and present orders will go here.</p>
+                </div>
+
+                <!-- ==== PAGE 4: Reports (Placeholder) ==== -->
+                <div id="reports" class="admin-page-section hidden p-6 rounded-lg">
+                    <h2 class="text-2xl font-bold text-white mb-6">Export Reports</h2>
+                    <p class="text-gray-400">A button to export daily reports will go here.</p>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ** Cache-busting link ** -->
+    <script src="admin.js?v=6"></script> 
+    
+    <!-- JavaScript for 3D Background -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lucide Icons
+            try { lucide.createIcons(); } catch (e) { console.error("Lucide failed:", e); }
+
+            // --- 3D Animation ---
+            try {
+                const canvas = document.getElementById('bg-canvas');
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); 
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                const paperCount = 50; const papers = [];
+                const paperGeometry = new THREE.PlaneGeometry(0.5, 0.7); 
+                const paperMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+                for (let i = 0; i < paperCount; i++) {
+                    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+                    paper.position.x = (Math.random() - 0.5) * 20; paper.position.y = (Math.random() - 0.5) * 20; paper.position.z = (Math.random() - 0.5) * 10;
+                    paper.rotation.x = Math.random() * Math.PI; paper.rotation.y = Math.random() * Math.PI; paper.rotation.z = Math.random() * Math.PI;
+                    paper.userData.speed = { x: (Math.random() - 0.5) * 0.01, y: (Math.random() - 0.5) * 0.01, z: (Math.random() - 0.5) * 0.01, float: 0.01 + Math.random() * 0.02 };
+                    papers.push(paper); scene.add(paper);
+                }
+                camera.position.z = 5;
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    papers.forEach(paper => {
+                        paper.position.y += paper.userData.speed.float; paper.rotation.x += paper.userData.speed.x; paper.rotation.y += paper.userData.speed.y; paper.rotation.z += paper.userData.speed.z;
+                        if (paper.position.y > 10) { paper.position.y = -10; paper.position.x = (Math.random() - 0.5) * 20; }
+                    });
+                    renderer.render(scene, camera);
+                };
+                animate();
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                });
+            } catch (e) { console.error("Three.js animation failed:", e); }
+        });
+    </script>
+</body>
+</html>

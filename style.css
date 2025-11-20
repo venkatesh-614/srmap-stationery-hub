@@ -1,0 +1,33 @@
+/* Sets the default font for the entire page */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Adds a smooth transition effect for the file drop zone */
+.file-drop-zone {
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+/* Styles the file drop zone when a file is being dragged over it */
+.file-drop-zone.dragover {
+    background-color: #eef2ff; /* A light indigo color */
+    border-color: #4f46e5;     /* A darker indigo color */
+}
+
+/* Custom animation for making sections appear smoothly */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Class to apply the fadeIn animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
