@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Chart Elements ---
     const chartFilters = document.getElementById('chart-filters');
     const revenueChartCanvas = document.getElementById('revenue-chart');
-    let revenueChart = null; // To hold the chart instance
+    let revenueChart = null; 
 
     // --- NAVIGATION LOGIC ---
     function showPage(pageId) {
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pageId === 'queue') {
             fetchOrders(); 
             loadStats(); 
-            fetchChartData('month-by-week'); // Load default chart (new)
+            fetchChartData('month-by-week');
         } else if (pageId === 'pricing') {
             loadCurrentPrices(); 
         }
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (updatedOrder.status === 'ready' && readyCol) {
                 readyCol.prepend(updatedCard);
             }
-            loadStats(); // Update stats after moving a card
+            loadStats(); 
         } catch (error) {
             console.error('Full error in updateOrderStatus:', error);
         }
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         revenueChart = new Chart(ctx, {
-            type: 'bar', // Type is bar chart
+            type: 'bar', 
             data: {
                 labels: labels,
                 datasets: [
@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     legend: {
                         display: false
                     },
-                    // Data labels (numbers on top)
+                    
                     datalabels: {
                         anchor: 'end',
                         align: 'end',
